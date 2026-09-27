@@ -1,23 +1,23 @@
 ---
-name: dsh-computer-use-cua-skill
-description: 通过 Cua Driver CLI 直接操作本地桌面 (读取窗口/截图/点击/输入), 以及排查 DSH computer-use 预设挂载失败.
+name: computer-use-cua-skill
+description: 通过 Cua Driver 操作本地桌面 (读取窗口/截图/点击/输入), 含 macOS 授权模型与 GUI 宿主 spawn 子进程的 PATH 陷阱.
 ---
 
-# DSH Computer Use via Cua Driver
+# Computer Use via Cua Driver
 
-本技能内容以 Cua Driver `0.30.1` 与 dsh `0.1.7-rc.2` 为基准编写.
+本技能内容以 Cua Driver `0.30.1` 为基准编写.
 
 ## 核心结论
 
-**优先用 CLI, 不要依赖 agent preset.**
+**优先用 CLI, 不要让宿主去 spawn MCP 子进程.**
 
-`cua-driver call` 提供与 MCP 相同的工具能力, 但不经过 preset/profile/Loader 任何一层, 任何会话都能直接使用. 实测已验证可行.
+`cua-driver call` 提供与 MCP 相同的全部工具能力, 但不经过任何宿主的配置层. 任何环境都能直接使用, 排查成本最低.
 
 ## 章节索引
 
-- [CLI Usage](references/cli-usage.md): 安装位置, 工具清单, 调用范式与输出形态.
+- [CLI Usage](references/cli-usage.md): 安装位置, 58 个工具的分组清单, 调用范式与输出形态.
 - [Permission Model](references/permission-model.md): macOS TCC 授权, 权限模式, 遥测与安全边界.
-- [Preset Mount](references/preset-mount.md): DSH computer-use preset 的组成与失败排查 (含已确认的 PATH 陷阱).
+- [Spawning From GUI](references/spawning-from-gui.md): GUI 应用拉不起 driver 的根因与处置 (跨平台通用).
 - [Verify](references/verify.md): 从零验证环境是否可用.
 
 ## 操作前必读
@@ -38,3 +38,11 @@ cua-driver describe <tool>         # 查看单个工具的参数 schema
 ```
 
 工具名与参数见 [CLI Usage](references/cli-usage.md).
+
+## 推荐工作流
+
+1. `list_windows` 或 `get_accessibility_tree` — 确认目标窗口存在, 拿到 `pid` / `window_id`.
+2. `get_window_state` — 取 AX 元素树, 优先用结构化 `elements` 定位.
+3. 优先用 `element_index + window_id` 定位, 而非盲点坐标.
+4. 执行动作.
+5. 重新观测 — **已发出的点击不保证达成预期结果**, 必须重新验证.
