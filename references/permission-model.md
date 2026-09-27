@@ -49,7 +49,7 @@ macOS 不一定一次弹出两个授权框, 用 `permissions status` 确认实�
 
 | 模式 | 适用场景 |
 |---|---|
-| `standard` (默认) | 常规本地 CLI/MCP 使用. 常规操作无提示, 残留边界 (如附着已登录的 Chromium 配置) 仍需显式授权 |
+| `standard` (默认) | 常规本地使用. 常规操作无提示, 残留边界 (如附着已登录的 Chromium 配置) 仍需显式授权 |
 | `bounded` | 无人值守场景. **必须**提供能力清单, 清单外的范围默认拒绝 |
 | `unrestricted` | 一次性或完全可信环境. 必须显式加 `--dangerously-bypass-approvals` |
 
@@ -63,11 +63,11 @@ cua-driver serve --dangerously-bypass-approvals               # unrestricted
 
 单独传 `--permission-mode unrestricted` 会 **fail closed** (失败即关闭), 不会默认放开.
 
-授权在**原生运行时内部**强制执行: 位置在传输参数清洗之后、平台动作执行之前. CLI / MCP / SDK 走同一个执行边界.
+授权在**原生运行时内部**强制执行: 位置在传输参数清洗之后、平台动作执行之前. 所有接入方式走同一个执行边界.
 
 ## daemon
 
-`cua-driver mcp` 和 `cua-driver serve` 共用运行时. 查询状态:
+`cua-driver serve` 提供常驻运行时. 查询状态:
 
 ```shell
 cua-driver status

@@ -49,8 +49,6 @@ Cua Driver daemon is running
   permission mode: standard (built_in_default)
 ```
 
-**注意区分**: daemon 在跑 **不等于** MCP 通道能连上, 两者独立.
-
 ## 4. 桌面可读性 (关键)
 
 ```shell
@@ -63,35 +61,13 @@ Cua Driver daemon is running
 
 单凭 `--version` 成功**不能**证明桌面访问可用.
 
-## 5. 工具目录与 MCP 通道
+## 5. 工具目录
 
 ```shell
 ~/.local/bin/cua-driver list-tools
 ```
 
 期望列出约 58 个工具.
-
-需要验证 MCP stdio 传输本身时, 发一次 `initialize` 握手:
-
-```python
-import subprocess, json
-p = subprocess.Popen(["/Users/<you>/.local/bin/cua-driver", "mcp"],
-    stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
-p.stdin.write(json.dumps({"jsonrpc":"2.0","id":1,"method":"initialize","params":{
-    "protocolVersion":"2024-11-05","capabilities":{},
-    "clientInfo":{"name":"probe","version":"1.0"}}}) + "\n")
-p.stdin.flush()
-print(p.stdout.readline())   # 期望含 serverInfo: cua-driver ...
-p.kill()
-```
-
-**重要**: 若要复现 GUI 宿主的 spawn 环境, 必须用**不含 `~/.local/bin` 的 PATH**:
-
-```python
-env = {"PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin", "HOME": "/Users/<you>"}
-```
-
-用当前 shell 的 PATH 测试会得到**假阳性**. 详见 [Spawning From GUI](spawning-from-gui.md).
 
 ## 6. 完整验证脚本
 
